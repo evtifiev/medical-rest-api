@@ -1,0 +1,12 @@
+.idea
+.venv
+.DS_Store
+
+__pycache__/
+*.py[cod]
+docker-compose.yml
+dockerfile
+bin/run.sh
+log/
+files/
+app/celerybeat-schedule.db
