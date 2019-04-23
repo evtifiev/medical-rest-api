@@ -2,6 +2,7 @@
 from sqlalchemy import Column
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.model import Base
 
@@ -9,8 +10,8 @@ from app.model import Base
 # Модель Должности
 class Position(Base):
     __tablename__ = 'position'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255), unique=True)  # Название должности
+    id = Column(Integer, unique=True, nullable=False, primary_key=True)
+    name = Column(String(300), unique=True)  # Название должности
     user = relationship("User", uselist=False, back_populates="position")
 
     @classmethod

@@ -12,7 +12,7 @@ from app.model.module import role_has_permission_table
 # Модель Роли
 class Role(Base):
     __tablename__ = 'role'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, unique=True, nullable=False, primary_key=True)
     name = Column(String(90), nullable=False)
     description = Column(String(255), nullable=False)
     default = Column(Boolean, default=False)

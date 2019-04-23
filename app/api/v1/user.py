@@ -27,7 +27,6 @@ FIELDS = {
     },
     'password': {
         'type': 'string',
-        'regex': '[0-9a-zA-Z]\w{3,14}',
         'required': True,
         'minlength': 8,
         'maxlength': 64
@@ -64,13 +63,13 @@ FIELDS = {
     },
     'mobile': {
         'type': 'string',
-        'required': True,
+        'required': False,
         'min': 11,
         'max': 30
     },
     'phone': {
         'type': 'string',
-        'required': True,
+        'required': False,
         'min': 3,
         'max': 30
     },
@@ -142,14 +141,14 @@ class UserCollection(BaseResource):
         if user_req:
             user = User()
             user.username = user_req['username']
-            user.password = hash_password(user_req['password']).decode('utf-8')
+            user.password = hash_password(base64.b64decode(user_req['password']).decode("utf-8")).decode('utf-8')
             user.last_name = user_req['last_name'] if 'last_name' in user_req else None
             user.first_name = user_req['first_name'] if 'first_name' in user_req else None
             user.middle_name = user_req['middle_name'] if 'middle_name' in user_req else None
             user.email = user_req['email']
-            user.email_password = user_req['email_password']
-            user.mobile = user_req['mobile']
-            user.phone = user_req['phone']
+            user.email_password = user_req['email_password'] if 'email_password' in user_req else None
+            user.mobile = user_req['mobile'] if 'mobile' in user_req else None
+            user.phone = user_req['phone'] if 'phone' in user_req else None
             user.info = user_req['info'] if 'info' in user_req else None
             user.blocked = user_req['blocked'] if 'blocked' in user_req else None
             sid = uuid()
@@ -174,7 +173,11 @@ class UserCollection(BaseResource):
         session = req.context['session']
         user_dbs = session.query(User).all()
         if user_dbs:
-            obj = [user.to_dict_all() for user in user_dbs]
+            # Если идет запрос простого списка Simple List
+            if req.get_param_as_bool('sl'):
+                obj = [user.dict_users_list() for user in user_dbs]
+            else:
+                obj = [user.to_dict_all() for user in user_dbs]
             self.on_success(res, obj)
         else:
             raise AppError()
@@ -312,6 +315,7 @@ class Auth(BaseResource):
             user.numeric_id = sid
             user.token = encrypt_token(sid).decode('utf-8')
             session.add(user)
+            print(user.id)
             session.commit()
             self.on_success(res, user.get_token())
         else:

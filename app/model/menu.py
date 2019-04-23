@@ -3,6 +3,7 @@
 from sqlalchemy import Column
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.model import Base
 from app.model.module import menu_has_module_table
@@ -11,7 +12,7 @@ from app.model.module import menu_has_module_table
 # Модель меню пользователей
 class Menu(Base):
     __tablename__ = 'menu'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, unique=True, nullable=False, primary_key=True)
     name = Column(String(90), nullable=False)
     description = Column(String(255), nullable=False)
 

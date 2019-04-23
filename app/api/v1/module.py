@@ -18,7 +18,7 @@ MODULE_FIELDS = {
     'name': {
         'type': 'string',
         'required': True,
-        'minlength': 4,
+        'minlength': 3,
         'maxlength': 60
     },
     'parent_id': {
@@ -28,7 +28,7 @@ MODULE_FIELDS = {
     'url': {
         'type': 'string',
         'required': True,
-        'minlength': 4,
+        'minlength': 3,
         'maxlength': 90
     }
 }
@@ -41,13 +41,13 @@ MODULE_PERMISSION_FIELDS = {
     'name': {
         'type': 'string',
         'required': True,
-        'minlength': 4,
+        'minlength': 3,
         'maxlength': 90
     },
     'url': {
         'type': 'string',
         'required': True,
-        'minlength': 4,
+        'minlength': 3,
         'maxlength': 90
     },
     'method': {
@@ -193,7 +193,7 @@ class ModulePermissionCollection(BaseResource):
             module_permission.value = module_permission_req['value']
             session.add(module_permission)
             session.commit()
-            self.on_success(res, str(module_permission.id))
+            self.on_success(res, module_permission.id)
         else:
             raise InvalidParameterError(req.media)
 

@@ -13,6 +13,7 @@ from app.api.common import BaseResource
 from app.utils.hooks import auth_required
 from app.model import Menu, Module
 from app.errors import InvalidParameterError, DataNotFount
+import uuid
 
 LOG = log.get_logger()
 
@@ -43,13 +44,13 @@ def view_items_menu(session):
         for d in menu:
             if bool(d.parent_id):
                 tmp_dic_children.append({
-                    'parent_id': d.parent_id,
+                    'parent_id': str(d.parent_id),
                     'label': d.name,
-                    'id': d.id
+                    'id': str(d.id)
                 })
             else:
                 tmp_dict_parent.append({
-                    'id': d.id,
+                    'id': str(d.id),
                     'label': d.name
                 })
 
@@ -121,7 +122,7 @@ class MenuCollection(BaseResource):
 # Работа с определенной набором меню
 class MenuItem(BaseResource):
     """
-    Точка входа: /v1/settings/menu/{menu_id}
+    Точка входа: /v1/menu/{menu_id}
     Вывод информации о меню, редактирование меню, удаление меню
     """
 
@@ -133,7 +134,7 @@ class MenuItem(BaseResource):
             obj = menu.to_dict()
             temp_select = []
             for d in menu.modules:
-                temp_select.append(d.id)
+                temp_select.append(str(d.id))
             obj['menu_checked'] = temp_select
             obj['menu_items'] = view_items_menu(session)
             self.on_success(res, obj)
@@ -146,12 +147,12 @@ class MenuItem(BaseResource):
         menu_req = req.media
         if menu_req:
             try:
-                menu = Menu.find_one(session, menu_id)
+                menu = Menu.find_one(session, str(menu_id))
                 menu.name = menu_req['name']
                 menu.description = menu_req['description']
                 menu.modules.clear()
                 for id in menu_req['menu_checked']:
-                    module = Module.find_one(session, id)
+                    module = Module.find_one(session, str(id))
                     if module is not None:
                         # Add an association
                         menu.modules.append(module)

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from sqlalchemy import Column, Table
-from sqlalchemy import String, Integer, ForeignKey, Boolean
+from sqlalchemy import String, ForeignKey, Integer
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.model import Base
 
@@ -21,7 +22,7 @@ menu_has_module_table = Table('menu_has_module', Base.metadata,
 # Группы разрешений, указывают на модули
 class Module(Base):
     __tablename__ = 'module'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, unique=True, nullable=False, primary_key=True)
     name = Column(String(90), nullable=False)
     parent_id = Column(Integer, ForeignKey('module.id'))
     url = Column(String(90), nullable=False)
@@ -48,11 +49,12 @@ class Module(Base):
 
 class ModulePermission(Base):
     __tablename__ = 'module_permission'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, unique=True, nullable=False, primary_key=True)
     module_id = Column(Integer, ForeignKey('module.id'))
     name = Column(String(90), nullable=False)
     url = Column(String(90), nullable=False)
     method = Column(String(10), nullable=False)
+    value = Column(String(50), nullable=True)
 
     def __repr__(self):
         return "<ModulePermission(name='%s')>" % \
