@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from sqlalchemy import Column
-from sqlalchemy import Integer, ForeignKey
+from sqlalchemy import Integer, ForeignKey, String
 from sqlalchemy_utils import ChoiceType
 from sqlalchemy.orm import relationship
 
@@ -28,6 +28,7 @@ class Visit(Base):
     patient_id = Column(Integer, ForeignKey('patient.id'))  # Идентификатор пациента
     doctor_id = Column(Integer, ForeignKey('doctor.id'))  # Идентификатор доктора
     source_of_financing = Column(ChoiceType(FinancingType, impl=Integer()))  # Источник финансирования
+    comment = Column(String(500), nullable=True)  # Комментарий визита внутренний
 
     schedule = relationship("Schedule")
     doctor = relationship("Doctor")

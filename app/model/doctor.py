@@ -37,6 +37,7 @@ class Doctor(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     doctor_specialization_id = Column(Integer, ForeignKey('doctor_specialization.id'))
     creator_id = Column(Integer, ForeignKey('user.id'))
+    color = Column(String(30), nullable=True)
 
     user = relationship("User", backref='doctor', primaryjoin="Doctor.user_id==User.id")
     creator = relationship("User", backref='creator', primaryjoin="Doctor.creator_id==User.id")

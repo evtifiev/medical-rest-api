@@ -29,6 +29,10 @@ FIELDS_DOCTOR = {
     'doctor_specialization_id': {
         'type': 'integer',
         'required': True
+    },
+    'color': {
+        'type': 'string',
+        'required': True
     }
 }
 
@@ -49,7 +53,8 @@ def validate_doctor_specialization_create(req, res, resource, params):
 def validate_doctor_create(req, res, resource, params):
     schema = {
         'user_id': FIELDS_DOCTOR['user_id'],
-        'doctor_specialization_id': FIELDS_DOCTOR['user_id']
+        'doctor_specialization_id': FIELDS_DOCTOR['user_id'],
+        'color': FIELDS_DOCTOR['color']
     }
 
     v = Validator(schema)
@@ -150,8 +155,9 @@ class DoctorCollection(BaseResource):
         if doctor_req:
             user_id = doctor_req['user_id']
             doctor_specialization_id = doctor_req['doctor_specialization_id']
+            color = doctor_req['color']
             creator = req.context['user']
-            doctor = Doctor(user_id=user_id, doctor_specialization_id=doctor_specialization_id, creator_id=creator)
+            doctor = Doctor(user_id=user_id, doctor_specialization_id=doctor_specialization_id, creator_id=creator, color=color)
             session.add(doctor)
             session.commit()
             data = {
@@ -199,7 +205,8 @@ class DoctorItem(BaseResource):
                     update({
                     'user_id': doctor_req['user_id'],
                     'doctor_specialization_id': doctor_req['doctor_specialization_id'],
-                    'creator_id': req.context['user']
+                    'creator_id': req.context['user'],
+                    'color': doctor_req['color']
                 })
                 session.commit()
                 self.on_success(res)

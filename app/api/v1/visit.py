@@ -54,6 +54,10 @@ FIELDS_VISIT = {
         'type': 'integer',
         'required': False,
     },
+    'comment': {
+        'type': 'string',
+        'required': False
+    }
 }
 
 
@@ -65,7 +69,8 @@ def validate_visit_create(req, res, resource, params):
         'schedule_id': FIELDS_VISIT['schedule_id'],
         'doctor_id': FIELDS_VISIT['doctor_id'],
         'mobile': FIELDS_VISIT['mobile'],
-        'source_of_financing': FIELDS_VISIT['source_of_financing']
+        'source_of_financing': FIELDS_VISIT['source_of_financing'],
+        'comment': FIELDS_VISIT['comment']
     }
 
     v = Validator(schema)
@@ -102,6 +107,7 @@ class VisitCollection(BaseResource):
                 visit.doctor_id = visit_req['doctor_id']
                 visit.schedule_id = visit_req['schedule_id']
                 visit.source_of_financing = visit_req['source_of_financing']
+                visit.comment = visit_req['comment']
 
                 session.add(visit)
 
