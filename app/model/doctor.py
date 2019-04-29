@@ -62,8 +62,11 @@ class Doctor(Base):
             "id": self.id,
             "specialization": self.specialization.name,
             "doctor": self.user.full_name,
+            "user_id": self.user_id,
+            "doctor_specialization_id": self.doctor_specialization_id,
             "doctorShortName": self.user.short_name,
             "creator": self.creator.short_name,
+            "color": self.color,
             "created": alchemy.datetime_to_timestamp(self.created) * 1000,
         }
         return obj

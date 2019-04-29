@@ -43,8 +43,8 @@ class Visit(Base):
             'title': 'Пациент:  ' + self.patient.get_full_name() + '    Врач: ' + self.doctor.get_short_name(),
             'start': f'{self.schedule.date_start:%Y-%m-%d %H:%M}',
             'end': f'{self.schedule.date_end:%Y-%m-%d %H:%M}',
-            'backgroundColor': 'orange',
-            'borderColor': 'orange',
+            'backgroundColor': self.doctor.color,
+            'borderColor': self.doctor.color,
         }
         return obj
 

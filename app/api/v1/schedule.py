@@ -156,7 +156,7 @@ class ScheduleCollection(BaseResource):
         #             "date_end": alchemy.datetime_to_timestamp(schedule[3])
         #         } for schedule in schedules]
         #     }
-        if req.get_param_as_bool('doctor_id'):
+        if not req.get_param_as_bool('all') and not req.get_param_as_bool('calendar'):
             if req.params['doctor_id'] and req.params['date']:
                 day = datetime.datetime.strptime(req.params['date'], "%d.%m.%Y")
                 schedule_dbs = session.query(Schedule).filter(
@@ -174,30 +174,56 @@ class ScheduleCollection(BaseResource):
         #         and_(Schedule.date_start < one_mount, Schedule.is_busy == False)).all()
         #     obj = {"items": [schedule.to_dict() for schedule in schedule_dbs]}
 
-        if req.get_param_as_bool('all'):
-                subq = (session.query(
-                    Schedule.doctor_id, func.min(Schedule.date_end).label('date_start'),
-                    func.max(Schedule.date_end).label('date_end'),
-                ).group_by(Schedule.doctor_id).order_by(
-                    func.max(Schedule.date_end).desc())).subquery()
+        if req.get_param_as_bool('all') and not req.get_param_as_bool('calendar'):
+            subq = (session.query(
+                Schedule.doctor_id, func.min(Schedule.date_end).label('date_start'),
+                func.max(Schedule.date_end).label('date_end'),
+            ).group_by(Schedule.doctor_id).order_by(
+                func.max(Schedule.date_end).desc())).subquery()
 
-                schedules = (session.query(Doctor.user_id, subq, User.last_name, User.first_name, User.middle_name).
-                             join(subq, and_(Doctor.id == subq.c.doctor_id)).join(User, and_(Doctor.user_id == User.id))
-                             ).all()
+            schedules = (session.query(Doctor.user_id, subq, User.last_name, User.first_name, User.middle_name).
+                         join(subq, and_(Doctor.id == subq.c.doctor_id)).join(User, and_(Doctor.user_id == User.id))
+                         ).all()
 
-                if schedules:
-                    obj = {
-                        "items": [{
-                            "doctor": schedule[4] + ' ' + schedule[5] + ' ' + schedule[6],
-                            "date_start": alchemy.datetime_to_timestamp(schedule[2]),
-                            "date_end": alchemy.datetime_to_timestamp(schedule[3])
-                        } for schedule in schedules]
-                    }
+            if schedules:
+                obj = {
+                    "items": [{
+                        "doctor": schedule[4] + ' ' + schedule[5] + ' ' + schedule[6],
+                        "date_start": alchemy.datetime_to_timestamp(schedule[2]),
+                        "date_end": alchemy.datetime_to_timestamp(schedule[3])
+                    } for schedule in schedules]
+                }
+
+        if req.get_param_as_bool('calendar') and not req.get_param_as_bool('all'):
+            day = datetime.datetime.strptime(req.params['date'], "%d.%m.%Y")
+            dates = session.query(func.to_char(Schedule.date_start, 'YYYY-MM-DD').label('day')).filter(
+                and_(Schedule.date_start >= day,
+                     Schedule.is_busy == False, Schedule.doctor_id == int(req.params['doctor_id']))
+            ).group_by('day').order_by('day').all()
+
+            obj = {"items": [int(datetime.datetime.strptime(date[0], '%Y-%m-%d').timestamp()) * 1000 for date in dates]}
 
         if len(obj.get('items')):
             self.on_success(res, obj)
         else:
             raise DataNotFount()
+
+
+class ScheduleCalendarFilter(BaseResource):
+    @falcon.before(auth_required)
+    def on_get(self, req, res):
+        session = req.context['session']
+        day = datetime.datetime.strptime(req.params['date'], "%d.%m.%Y")
+        try:
+            dates = session.query(func.to_char(Schedule.date_start, 'YYYY-MM-DD').label('day')).filter(
+                and_(Schedule.date_start >= day,
+                     Schedule.is_busy == False, Schedule.doctor_id == int(req.params['doctor_id']))
+            ).group_by('day').order_by('day').all()
+
+            obj = {"items": [int(datetime.datetime.strptime(date[0], '%Y-%m-%d').timestamp()) for date in dates]}
+            self.on_success(res, obj)
+        except:
+            DataNotFount()
 
 # Работа с подразделением
 # class ScheduleItem(BaseResource):
