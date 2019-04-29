@@ -40,7 +40,7 @@ class Visit(Base):
     def to_dict(self):
         obj = {
             'id': self.id,
-            'title': 'Пациент:  ' + self.patient.get_full_name() + '    Врач: ' + self.doctor.get_short_name(),
+            'title': '   ' + str(self.source_of_financing.label) + '     Пациент:  ' + self.patient.get_full_name() + '   Тел: ' + self.patient.mobile + ' Врач: ' + self.doctor.get_short_name(),
             'start': f'{self.schedule.date_start:%Y-%m-%d %H:%M}',
             'end': f'{self.schedule.date_end:%Y-%m-%d %H:%M}',
             'backgroundColor': self.doctor.color,
