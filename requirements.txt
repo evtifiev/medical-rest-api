@@ -16,7 +16,7 @@ sqlalchemy-media==0.16.0
 wand==0.4.4
 python-magic==0.4.15
 psycopg2-binary==2.7.6.1
-jinja2==2.10
+jinja2==2.11.3
 pdfkit==0.6.1
 falcon-multipart==0.2.0
 celery==4.2.1
